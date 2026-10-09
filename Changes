@@ -1,5 +1,57 @@
 Revision history for Perl extension Params-Util
 
+1.105_001	2026-05-02
+	- Bump to 1.105_001 to get over shadowing ETHER/1.103_01
+	- add _CLASSCAN, _INSTANCECAN and _INVOCANTCAN predicates to
+	  resolve the UNIVERSAL::can debacle by calling ->can as a method
+	  rather than as a function, respecting any overridden can() in
+	  the invocant's class hierarchy.
+	- consolidate the XS layer using XSUB ALIAS groups (ADR-005):
+	  string validators (_IDENTIFIER/_CLASS), numeric validators
+	  (_POSINT/_NONNEGINT), class dispatchers (_CLASSISA/_CLASSDOES/
+	  _CLASSCAN/_SUBCLASS), instance dispatchers (_INSTANCE/
+	  _INSTANCEDOES/_INSTANCECAN), and invocant dispatchers
+	  (_INVOCANT/_INVOCANTCAN). All previously PP-only predicates
+	  except _SET/_SET0/_HANDLE/_DRIVER now have XS accelerators.
+	- replace hand-maintained t/pp and t/xs trees with a
+	  Test::WriteVariants pipeline driven by Sandbox/Tumble.pm
+	  (ADR-001). Canonical tests live in t/inline/; backend variants
+	  are generated at `perl Makefile.PL` time and shipped in the
+	  distribution so CPAN consumers do not need Test::WriteVariants.
+	- add memory-leak coverage (t/inline/10_leaks.t) exercising both
+	  success and failure paths through call_method to verify
+	  ENTER/SAVETMPS/FREETMPS/LEAVE handling is leak-free.
+	- document open design decisions as ADRs in lib/Params/Util/
+	  (ADR-001..005, Nygard format).
+	- update SUPPORT section to point to GitHub Issues as the primary
+	  bug tracker; RT remains as historical reference.
+
+1.103_001	2026-05-01
+	- fix #3 / RT#75561: XS variants of _HASH/_HASH0/_ARRAY/_ARRAY0
+	  now reject blessed references, matching the documented "raw and
+	  unblessed" contract and the pure-perl behaviour. Thanks to
+	  Guillaume Aubert (AUBERTG) for the original RT report (2012),
+	  Paul Cochrane (PCOCHRANE) for tests and patches (2014), Ricardo
+	  Signes (rjbs) for confirming the PP code is the reference (2024),
+	  and Matthew Horsfall (@wolfsage) for the GitHub re-report.
+	- fix RT#141940: declare `parent` as a runtime prerequisite.
+	  lib/Params/Util.pm uses `use parent qw{Exporter XSLoader}` but
+	  parent was only listed in CONFIGURE_REQUIRES; on Perls older
+	  than 5.10.1 it is not core and must be pulled in at install time.
+	- fix duplicate `requires` key in the test prereqs hash in
+	  Makefile.PL that silently dropped Test::More and Storable from
+	  the META develop section.
+	- update ppport.h from Devel::PPPort 3.73
+	- replace Travis-CI configuration with GitHub Actions: Linux matrix
+	  (Perl 5.30..5.42) running in perldocker/perl-tester containers,
+	  plus host-runner jobs on macOS-latest and Windows-latest with
+	  Strawberry to verify XS builds under clang and MSVC.
+	- add Docker-based devcontainer setup (.devcontainer + docker-compose)
+	  for local multi-Perl testing without installing Perl on the host.
+	- author tests: suppress Bangs::ProhibitNumberedNames for the
+	  intentionally-named _SCALAR0/_ARRAY0/_HASH0/_SET0 predicates,
+	  fix minor perltidy formatting in Makefile.PL and t/driver/.
+
 1.102	2020-11-02
 	- fix RT#133623 - Can't install in pureperl mode. Thanks to Nigel
 	  Gregoire (@nfg) for reporting and proposal for proper fix.

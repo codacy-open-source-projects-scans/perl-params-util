@@ -62,20 +62,21 @@ use parent qw{Exporter XSLoader};
 
 use Params::Util::PP qw();
 
-our $VERSION = '1.102';
+our $VERSION = '1.105_001';
 
 local $ENV{PERL_DL_NONLAZY} = 0 if $ENV{PERL_DL_NONLAZY};
 XSLoader::load("Params::Util", $VERSION) unless $ENV{PERL_PARAMS_UTIL_PP};
 
 our @EXPORT_OK = qw{
   _STRING     _IDENTIFIER
-  _CLASS      _CLASSISA   _SUBCLASS  _DRIVER  _CLASSDOES
+  _CLASS      _CLASSISA   _CLASSCAN  _SUBCLASS  _DRIVER  _CLASSDOES
   _NUMBER     _POSINT     _NONNEGINT
   _SCALAR     _SCALAR0
   _ARRAY      _ARRAY0     _ARRAYLIKE
   _HASH       _HASH0      _HASHLIKE
   _CODE       _CODELIKE
-  _INVOCANT   _REGEX      _INSTANCE  _INSTANCEDOES
+  _INVOCANT   _INVOCANTCAN
+  _REGEX      _INSTANCE  _INSTANCEDOES  _INSTANCECAN
   _SET        _SET0
   _HANDLE
 };
@@ -156,6 +157,17 @@ This routine behaves exactly like C<L</_CLASSISA>>, but checks with C<< ->DOES
 >> rather than C<< ->isa >>.  This is probably only a good idea to use on Perl
 5.10 or later, when L<UNIVERSAL::DOES|UNIVERSAL::DOES/DOES> has been
 implemented.
+
+=head2 _CLASSCAN $string, $method
+
+The C<_CLASSCAN> function tests whether a value is a valid class name that
+provides a particular method via C<< ->can >>.
+
+This avoids calling C<UNIVERSAL::can> as a function, which is considered
+problematic because it bypasses any overridden C<can> method.
+
+Returns the string as a convenience if it is a valid class name that provides
+the method, or C<undef> if not.
 
 =head2 _SUBCLASS $string, $class
 
@@ -373,6 +385,20 @@ This routine behaves exactly like C<L</_INSTANCE>>, but checks with C<< ->DOES
 5.10 or later, when L<UNIVERSAL::DOES|UNIVERSAL::DOES/DOES> has been
 implemented.
 
+=head2 _INSTANCECAN $object, $method
+
+This routine behaves exactly like C<L</_INSTANCE>>, but checks with C<< ->can
+>> rather than C<< ->isa >>.  Returns the object as a convenience if it is
+blessed and provides the specified method, or C<undef> if not.
+
+=head2 _INVOCANTCAN $value, $method
+
+Tests whether the given value is a valid method invocant (class name or
+blessed object) that provides a particular method via C<< ->can >>.
+
+Returns the value itself as a convenience, or C<undef> if the value is not
+a valid invocant or does not provide the method.
+
 =head2 _REGEX $value
 
 The C<_REGEX> function is intended to be imported into your package,
@@ -446,18 +472,26 @@ or the class fails the isa test.
 
 =head1 TO DO
 
-- Add _CAN to help resolve the UNIVERSAL::can debacle
-
 - Implement an assertion-like version of this module, that dies on
-error.
+error.  See L<Params::Util::ADR-003> for design considerations.
 
-- Implement a Test:: version of this module, for use in testing
+- Implement a Test:: version of this module, for use in testing.
+See L<Params::Util::ADR-004> for the rationale to ship it as a
+separate distribution.
 
 =head1 SUPPORT
 
-Bugs should be reported via the CPAN bug tracker at
+Bugs and feature requests should be reported via GitHub Issues at
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Params-Util>
+L<https://github.com/perl5-utils/Params-Util/issues>
+
+The source repository is at
+
+L<https://github.com/perl5-utils/Params-Util>
+
+For historical bug reports, see the CPAN RT queue at
+
+L<https://rt.cpan.org/Dist/Display.html?Name=Params-Util>
 
 =head1 AUTHOR
 
@@ -473,7 +507,7 @@ L<Params::Validate>
 
 Copyright 2005 - 2012 Adam Kennedy.
 
-Copyright 2020 - 2020 Jens Rehsack.
+Copyright 2020 - 2026 Jens Rehsack.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

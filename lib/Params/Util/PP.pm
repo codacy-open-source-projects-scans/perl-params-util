@@ -3,7 +3,7 @@ package Params::Util::PP;
 use strict;
 use warnings;
 
-our $VERSION = '1.102';
+our $VERSION = '1.105_001';
 
 =pod
 
@@ -38,6 +38,7 @@ Params::Util::PP->can("looks_like_number") or *looks_like_number = sub {
 
 ## no critic (Subroutines::ProhibitSubroutinePrototypes, Subroutines::RequireArgUnpacking)
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+## no critic (Bangs::ProhibitNumberedNames)
 
 sub _XScompiled { return 0; }
 
@@ -67,6 +68,11 @@ sub _CLASSISA ($$)
 sub _CLASSDOES ($$)
 {
     return (defined $_[0] and not ref $_[0] and $_[0] =~ m/^[^\W\d]\w*(?:::\w+)*\z/s and $_[0]->DOES($_[1])) ? $_[0] : undef;
+}
+
+sub _CLASSCAN ($$)
+{
+    return (defined $_[0] and not ref $_[0] and $_[0] =~ m/^[^\W\d]\w*(?:::\w+)*\z/s and $_[0]->can($_[1])) ? $_[0] : undef;
 }
 
 sub _SUBCLASS ($$)
@@ -175,6 +181,18 @@ sub _INSTANCE ($$)
 sub _INSTANCEDOES ($$)
 {
     return (Scalar::Util::blessed($_[0]) and $_[0]->DOES($_[1])) ? $_[0] : undef;
+}
+
+sub _INSTANCECAN ($$)
+{
+    return (Scalar::Util::blessed($_[0]) and $_[0]->can($_[1])) ? $_[0] : undef;
+}
+
+sub _INVOCANTCAN ($$)
+{
+    return (defined $_[0] and (Scalar::Util::blessed($_[0]) or _CLASS($_[0])) and $_[0]->can($_[1]))
+      ? $_[0]
+      : undef;
 }
 
 sub _REGEX ($)

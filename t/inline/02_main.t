@@ -6,10 +6,9 @@ BEGIN
 {
     $|  = 1;
     $^W = 1;
-    $ENV{PERL_PARAMS_UTIL_PP} ||= 1;
 }
 
-use Test::More tests => 712;
+use Test::More tests => 770;
 use File::Spec::Functions ':ALL';
 use Scalar::Util 'refaddr';
 use Params::Util ();
@@ -431,14 +430,15 @@ my $array = ['foo', 'bar'];
 
 # Test bad things against the actual function
 dies("Params::Util::_ARRAY()", qr/Not enough arguments/, '...::_ARRAY() dies');
-null(Params::Util::_ARRAY(undef),        '...::_ARRAY(undef) returns undef');
-null(Params::Util::_ARRAY(''),           '...::_ARRAY(nullstring) returns undef');
-null(Params::Util::_ARRAY(1),            '...::_ARRAY(number) returns undef');
-null(Params::Util::_ARRAY('foo'),        '...::_ARRAY(string) returns undef');
-null(Params::Util::_ARRAY(\'foo'),       '...::_ARRAY(SCALAR) returns undef');
-null(Params::Util::_ARRAY({foo => 1}),   '...::_ARRAY(HASH) returns undef');
-null(Params::Util::_ARRAY(sub () { 1 }), '...::_ARRAY(CODE) returns undef');
-null(Params::Util::_ARRAY([]),           '...::_ARRAY(empty ARRAY) returns undef');
+null(Params::Util::_ARRAY(undef),            '...::_ARRAY(undef) returns undef');
+null(Params::Util::_ARRAY(''),               '...::_ARRAY(nullstring) returns undef');
+null(Params::Util::_ARRAY(1),                '...::_ARRAY(number) returns undef');
+null(Params::Util::_ARRAY('foo'),            '...::_ARRAY(string) returns undef');
+null(Params::Util::_ARRAY(\'foo'),           '...::_ARRAY(SCALAR) returns undef');
+null(Params::Util::_ARRAY({foo => 1}),       '...::_ARRAY(HASH) returns undef');
+null(Params::Util::_ARRAY(sub () { 1 }),     '...::_ARRAY(CODE) returns undef');
+null(Params::Util::_ARRAY([]),               '...::_ARRAY(empty ARRAY) returns undef');
+null(Params::Util::_ARRAY(bless [1], 'cat'), '...::_ARRAY(blessed ARRAY) returns undef');
 
 # Test good things against the actual function (carefully)
 is(ref(Params::Util::_ARRAY([undef])),    'ARRAY',         '...::_ARRAY([undef]) returns true');
@@ -452,14 +452,15 @@ ok(defined *_ARRAY{CODE}, '_ARRAY imported ok');
 
 # Test bad things against the actual function
 dies("_ARRAY();", qr/Not enough arguments/, '_ARRAY() dies');
-null(_ARRAY(undef),        '_ARRAY(undef) returns undef');
-null(_ARRAY(''),           '_ARRAY(nullstring) returns undef');
-null(_ARRAY(1),            '_ARRAY(number) returns undef');
-null(_ARRAY('foo'),        '_ARRAY(string) returns undef');
-null(_ARRAY(\'foo'),       '_ARRAY(SCALAR) returns undef');
-null(_ARRAY({foo => 1}),   '_ARRAY(HASH) returns undef');
-null(_ARRAY(sub () { 1 }), '_ARRAY(CODE) returns undef');
-null(_ARRAY([]),           '_ARRAY(empty ARRAY) returns undef');
+null(_ARRAY(undef),            '_ARRAY(undef) returns undef');
+null(_ARRAY(''),               '_ARRAY(nullstring) returns undef');
+null(_ARRAY(1),                '_ARRAY(number) returns undef');
+null(_ARRAY('foo'),            '_ARRAY(string) returns undef');
+null(_ARRAY(\'foo'),           '_ARRAY(SCALAR) returns undef');
+null(_ARRAY({foo => 1}),       '_ARRAY(HASH) returns undef');
+null(_ARRAY(sub () { 1 }),     '_ARRAY(CODE) returns undef');
+null(_ARRAY([]),               '_ARRAY(empty ARRAY) returns undef');
+null(_ARRAY(bless [1], 'cat'), '_ARRAY(blessed ARRAY) returns undef');
 
 # Test good things against the actual function (carefully)
 is(ref(_ARRAY([undef])),    'ARRAY',         '_ARRAY([undef]) returns true');
@@ -472,13 +473,14 @@ is(refaddr(_ARRAY($array)), refaddr($array), '_ARRAY($array) returns the same AR
 
 # Test bad things against the actual function
 dies("Params::Util::_ARRAY0();", qr/Not enough arguments/, '...::_ARRAY0() dies');
-null(Params::Util::_ARRAY0(undef),        '...::_ARRAY0(undef) returns undef');
-null(Params::Util::_ARRAY0(''),           '...::_ARRAY0(nullstring) returns undef');
-null(Params::Util::_ARRAY0(1),            '...::_ARRAY0(number) returns undef');
-null(Params::Util::_ARRAY0('foo'),        '...::_ARRAY0(string) returns undef');
-null(Params::Util::_ARRAY0(\'foo'),       '...::_ARRAY0(SCALAR) returns undef');
-null(Params::Util::_ARRAY0({foo => 1}),   '...::_ARRAY0(HASH) returns undef');
-null(Params::Util::_ARRAY0(sub () { 1 }), '...::_ARRAY0(CODE) returns undef');
+null(Params::Util::_ARRAY0(undef),           '...::_ARRAY0(undef) returns undef');
+null(Params::Util::_ARRAY0(''),              '...::_ARRAY0(nullstring) returns undef');
+null(Params::Util::_ARRAY0(1),               '...::_ARRAY0(number) returns undef');
+null(Params::Util::_ARRAY0('foo'),           '...::_ARRAY0(string) returns undef');
+null(Params::Util::_ARRAY0(\'foo'),          '...::_ARRAY0(SCALAR) returns undef');
+null(Params::Util::_ARRAY0({foo => 1}),      '...::_ARRAY0(HASH) returns undef');
+null(Params::Util::_ARRAY0(sub () { 1 }),    '...::_ARRAY0(CODE) returns undef');
+null(Params::Util::_ARRAY0(bless [], 'cat'), '...::_ARRAY0(blessed ARRAY) returns undef');
 
 # Test good things against the actual function (carefully)
 is(ref(Params::Util::_ARRAY0([])),         'ARRAY',         '...::_ARRAY0(empty ARRAY) returns undef');
@@ -493,13 +495,14 @@ ok(defined *_ARRAY0{CODE}, '_ARRAY0 imported ok');
 
 # Test bad things against the actual function
 dies("_ARRAY0();", qr/Not enough arguments/, '_ARRAY0() dies');
-null(_ARRAY0(undef),        '_ARRAY0(undef) returns undef');
-null(_ARRAY0(''),           '_ARRAY0(nullstring) returns undef');
-null(_ARRAY0(1),            '_ARRAY0(number) returns undef');
-null(_ARRAY0('foo'),        '_ARRAY0(string) returns undef');
-null(_ARRAY0(\'foo'),       '_ARRAY0(SCALAR) returns undef');
-null(_ARRAY0({foo => 1}),   '_ARRAY0(HASH) returns undef');
-null(_ARRAY0(sub () { 1 }), '_ARRAY0(CODE) returns undef');
+null(_ARRAY0(undef),           '_ARRAY0(undef) returns undef');
+null(_ARRAY0(''),              '_ARRAY0(nullstring) returns undef');
+null(_ARRAY0(1),               '_ARRAY0(number) returns undef');
+null(_ARRAY0('foo'),           '_ARRAY0(string) returns undef');
+null(_ARRAY0(\'foo'),          '_ARRAY0(SCALAR) returns undef');
+null(_ARRAY0({foo => 1}),      '_ARRAY0(HASH) returns undef');
+null(_ARRAY0(sub () { 1 }),    '_ARRAY0(CODE) returns undef');
+null(_ARRAY0(bless [], 'cat'), '_ARRAY0(blessed ARRAY) returns undef');
 
 # Test good things against the actual function (carefully)
 is(ref(_ARRAY0([])),         'ARRAY',         '_ARRAY0(empty ARRAY) returns undef');
@@ -515,14 +518,15 @@ my $hash = {'foo' => 'bar'};
 
 # Test bad things against the actual function
 dies("Params::Util::_HASH();", qr/Not enough arguments/, '...::_HASH() dies');
-null(Params::Util::_HASH(undef),        '...::_HASH(undef) returns undef');
-null(Params::Util::_HASH(''),           '...::_HASH(nullstring) returns undef');
-null(Params::Util::_HASH(1),            '...::_HASH(number) returns undef');
-null(Params::Util::_HASH('foo'),        '...::_HASH(string) returns undef');
-null(Params::Util::_HASH(\'foo'),       '...::_HASH(SCALAR) returns undef');
-null(Params::Util::_HASH(['foo']),      '...::_HASH(ARRAY) returns undef');
-null(Params::Util::_HASH(sub () { 1 }), '...::_HASH(CODE) returns undef');
-null(Params::Util::_HASH({}),           '...::_HASH(empty HASH) returns undef');
+null(Params::Util::_HASH(undef),                 '...::_HASH(undef) returns undef');
+null(Params::Util::_HASH(''),                    '...::_HASH(nullstring) returns undef');
+null(Params::Util::_HASH(1),                     '...::_HASH(number) returns undef');
+null(Params::Util::_HASH('foo'),                 '...::_HASH(string) returns undef');
+null(Params::Util::_HASH(\'foo'),                '...::_HASH(SCALAR) returns undef');
+null(Params::Util::_HASH(['foo']),               '...::_HASH(ARRAY) returns undef');
+null(Params::Util::_HASH(sub () { 1 }),          '...::_HASH(CODE) returns undef');
+null(Params::Util::_HASH({}),                    '...::_HASH(empty HASH) returns undef');
+null(Params::Util::_HASH(bless {a => 1}, 'cat'), '...::_HASH(blessed HASH) returns undef');
 
 # Test good things against the actual function (carefully)
 is(ref(Params::Util::_HASH({foo => 1})), 'HASH',         '...::_HASH([undef]) returns ok');
@@ -535,14 +539,15 @@ ok(defined *_HASH{CODE}, '_HASH imported ok');
 
 # Test bad things against the actual function
 dies("_HASH();", qr/Not enough arguments/, '_HASH() dies');
-null(_HASH(undef),        '_HASH(undef) returns undef');
-null(_HASH(''),           '_HASH(nullstring) returns undef');
-null(_HASH(1),            '_HASH(number) returns undef');
-null(_HASH('foo'),        '_HASH(string) returns undef');
-null(_HASH(\'foo'),       '_HASH(SCALAR) returns undef');
-null(_HASH([]),           '_HASH(ARRAY) returns undef');
-null(_HASH(sub () { 1 }), '_HASH(CODE) returns undef');
-null(_HASH({}),           '...::_HASH(empty HASH) returns undef');
+null(_HASH(undef),                 '_HASH(undef) returns undef');
+null(_HASH(''),                    '_HASH(nullstring) returns undef');
+null(_HASH(1),                     '_HASH(number) returns undef');
+null(_HASH('foo'),                 '_HASH(string) returns undef');
+null(_HASH(\'foo'),                '_HASH(SCALAR) returns undef');
+null(_HASH([]),                    '_HASH(ARRAY) returns undef');
+null(_HASH(sub () { 1 }),          '_HASH(CODE) returns undef');
+null(_HASH({}),                    '...::_HASH(empty HASH) returns undef');
+null(_HASH(bless {a => 1}, 'cat'), '_HASH(blessed HASH) returns undef');
 
 # Test good things against the actual function (carefully)
 is(ref(_HASH({foo => 1})), 'HASH',         '_HASH([undef]) returns true');
@@ -554,13 +559,14 @@ is(refaddr(_HASH($hash)),  refaddr($hash), '_HASH($hash) returns the same refere
 
 # Test bad things against the actual function
 dies("Params::Util::_HASH0();", qr/Not enough arguments/, '...::_HASH0() dies');
-null(Params::Util::_HASH0(undef),        '...::_HASH0(undef) returns undef');
-null(Params::Util::_HASH0(''),           '...::_HASH0(nullstring) returns undef');
-null(Params::Util::_HASH0(1),            '...::_HASH0(number) returns undef');
-null(Params::Util::_HASH0('foo'),        '...::_HASH0(string) returns undef');
-null(Params::Util::_HASH0(\'foo'),       '...::_HASH0(SCALAR) returns undef');
-null(Params::Util::_HASH0(['foo']),      '...::_HASH0(ARRAY) returns undef');
-null(Params::Util::_HASH0(sub () { 1 }), '...::_HASH0(CODE) returns undef');
+null(Params::Util::_HASH0(undef),           '...::_HASH0(undef) returns undef');
+null(Params::Util::_HASH0(''),              '...::_HASH0(nullstring) returns undef');
+null(Params::Util::_HASH0(1),               '...::_HASH0(number) returns undef');
+null(Params::Util::_HASH0('foo'),           '...::_HASH0(string) returns undef');
+null(Params::Util::_HASH0(\'foo'),          '...::_HASH0(SCALAR) returns undef');
+null(Params::Util::_HASH0(['foo']),         '...::_HASH0(ARRAY) returns undef');
+null(Params::Util::_HASH0(sub () { 1 }),    '...::_HASH0(CODE) returns undef');
+null(Params::Util::_HASH0(bless {}, 'cat'), '...::_HASH0(blessed HASH) returns undef');
 
 # Test good things against the actual function (carefully)
 is(ref(Params::Util::_HASH0({})),         'HASH',         '...::_HASH0(empty ARRAY) returns undef');
@@ -574,13 +580,14 @@ ok(defined *_HASH0{CODE}, '_HASH0 imported ok');
 
 # Test bad things against the actual function
 dies("_HASH0();", qr/Not enough arguments/, '_HASH0() dies');
-null(_HASH0(undef),        '_HASH0(undef) returns undef');
-null(_HASH0(''),           '_HASH0(nullstring) returns undef');
-null(_HASH0(1),            '_HASH0(number) returns undef');
-null(_HASH0('foo'),        '_HASH0(string) returns undef');
-null(_HASH0(\'foo'),       '_HASH0(SCALAR) returns undef');
-null(_HASH0([]),           '_HASH0(ARRAY) returns undef');
-null(_HASH0(sub () { 1 }), '_HASH0(CODE) returns undef');
+null(_HASH0(undef),           '_HASH0(undef) returns undef');
+null(_HASH0(''),              '_HASH0(nullstring) returns undef');
+null(_HASH0(1),               '_HASH0(number) returns undef');
+null(_HASH0('foo'),           '_HASH0(string) returns undef');
+null(_HASH0(\'foo'),          '_HASH0(SCALAR) returns undef');
+null(_HASH0([]),              '_HASH0(ARRAY) returns undef');
+null(_HASH0(sub () { 1 }),    '_HASH0(CODE) returns undef');
+null(_HASH0(bless {}, 'cat'), '_HASH0(blessed HASH) returns undef');
 
 # Test good things against the actual function (carefully)
 is(ref(_HASH0({})),         'HASH',         '_HASH0(empty ARRAY) returns undef');
@@ -716,6 +723,74 @@ SKIP:
         ok(_INSTANCEDOES($object, 'Foo'), '_INSTANCEDOES(object, class) returns true when expected');
         is(refaddr(_INSTANCEDOES($object, 'Foo')), refaddr($object), '_INSTANCEDOES(object, class) returns the same object');
     }
+}
+
+#####################################################################
+# Tests for _CLASSCAN
+
+use_ok('Params::Util', '_CLASSCAN');
+ok(defined *_CLASSCAN{CODE}, '_CLASSCAN imported ok');
+
+# Bad values
+null(_CLASSCAN(undef,  'foo'), '_CLASSCAN(undef, method) returns undef');
+null(_CLASSCAN('',     'foo'), '_CLASSCAN(empty, method) returns undef');
+null(_CLASSCAN({},     'foo'), '_CLASSCAN(HASH, method) returns undef');
+null(_CLASSCAN([],     'foo'), '_CLASSCAN(ARRAY, method) returns undef');
+null(_CLASSCAN('4bad', 'foo'), '_CLASSCAN(bad class, method) returns undef');
+
+# Class without the method
+null(_CLASSCAN('Bad', 'foo'), '_CLASSCAN(Bad, foo) returns undef');
+
+# Class with the method
+is(_CLASSCAN('Foo', 'foo'), 'Foo', '_CLASSCAN(Foo, foo) returns class name');
+is(_CLASSCAN('Bar', 'foo'), 'Bar', '_CLASSCAN(Bar, foo) returns class name (inherited)');
+
+#####################################################################
+# Tests for _INSTANCECAN
+
+use_ok('Params::Util', '_INSTANCECAN');
+ok(defined *_INSTANCECAN{CODE}, '_INSTANCECAN imported ok');
+
+# Bad values
+null(_INSTANCECAN(undef,            'foo'), '_INSTANCECAN(undef, method) returns undef');
+null(_INSTANCECAN('Foo',            'foo'), '_INSTANCECAN(class string, method) returns undef');
+null(_INSTANCECAN({},               'foo'), '_INSTANCECAN(unblessed HASH, method) returns undef');
+null(_INSTANCECAN(bless({}, 'Bad'), 'foo'), '_INSTANCECAN(bad object, foo) returns undef');
+
+# Baz fakes isa('Foo') but does not actually provide 'foo'
+null(_INSTANCECAN(bless({}, 'Baz'), 'foo'), '_INSTANCECAN(Baz object, foo) returns undef');
+
+# Good values - only objects whose class genuinely provides 'foo'
+foreach my $object (grep { $_->can('foo') } @objects)
+{
+    ok(_INSTANCECAN($object, 'foo'), '_INSTANCECAN(object, foo) returns true when expected');
+    is(refaddr(_INSTANCECAN($object, 'foo')), refaddr($object), '_INSTANCECAN(object, foo) returns the same object');
+}
+
+#####################################################################
+# Tests for _INVOCANTCAN
+
+use_ok('Params::Util', '_INVOCANTCAN');
+ok(defined *_INVOCANTCAN{CODE}, '_INVOCANTCAN imported ok');
+
+# Bad values
+null(_INVOCANTCAN(undef,            'foo'), '_INVOCANTCAN(undef, method) returns undef');
+null(_INVOCANTCAN('',               'foo'), '_INVOCANTCAN(empty, method) returns undef');
+null(_INVOCANTCAN({},               'foo'), '_INVOCANTCAN(unblessed HASH, method) returns undef');
+null(_INVOCANTCAN('Bad',            'foo'), '_INVOCANTCAN(Bad, foo) returns undef');
+null(_INVOCANTCAN(bless({}, 'Bad'), 'foo'), '_INVOCANTCAN(bad object, foo) returns undef');
+
+# Good values - class
+is(_INVOCANTCAN('Foo', 'foo'), 'Foo', '_INVOCANTCAN(Foo class, foo) returns class name');
+
+# Baz fakes isa but does not provide 'foo'
+null(_INVOCANTCAN(bless({}, 'Baz'), 'foo'), '_INVOCANTCAN(Baz object, foo) returns undef');
+
+# Good values - object
+foreach my $object (grep { $_->can('foo') } @objects)
+{
+    ok(_INVOCANTCAN($object, 'foo'), '_INVOCANTCAN(object, foo) returns true when expected');
+    is(refaddr(_INVOCANTCAN($object, 'foo')), refaddr($object), '_INVOCANTCAN(object, foo) returns the same object');
 }
 
 #####################################################################

@@ -16,6 +16,17 @@ BEGIN
 use inc::latest 'Capture::Tiny';
 use inc::latest 'Config::AutoConf';
 
+if (-d 'Sandbox')
+{
+    eval "use Sandbox::Tumble ();";
+    $@ and die $@;
+    eval "use File::Path ();";
+    File::Path->import;
+    -d 't/pp' and rmtree('t/pp');
+    -d 't/xs' and rmtree('t/xs');
+    Sandbox::Tumble->tumble(qw(t));
+}
+
 unless (-f "META.yml")
 {
     if (inc::latest->can("write"))
@@ -44,6 +55,7 @@ my $loadable_xs = Config::AutoConf::ParamsUtil->check_paramsutil_prerequisites()
 my %RUN_DEPS = (
     'Scalar::Util' => $loadable_xs ? '1.18' : '1.10',
     'XSLoader'     => "0.22",
+    'parent'       => 0,
 );
 my %BUNDLE_CONFIGURE_DEPS = (
     'inc::latest'      => '0.500',
@@ -97,16 +109,14 @@ WriteMakefile1(
                     'Test::Pod::Coverage'                 => 0,
                     'Test::Pod::Spelling::CommonMistakes' => 0,
                     'Test::Spelling'                      => 0,
+                    'Test::WriteVariants'                 => '0.014',
                 },
             },
             configure => {
                 requires   => {%CONFIGURE_DEPS},
                 recommends => {'Config::AutoConf' => '0.315'}
             },
-            test => {
-                requires => {%TEST_DEPS},
-                requires => {'Test::LeakTrace' => 0}
-            },
+            test    => {requires => {%TEST_DEPS, 'Test::LeakTrace' => 0}},
             runtime => {requires => {%RUN_DEPS}},
         },
     },
@@ -120,11 +130,12 @@ WriteMakefile1(
     TEST_REQUIRES      => \%TEST_DEPS,
     XS                 => {map { (my $tgt = $_) =~ s/\.xs$/\.c/; $_ => $tgt; } @XS_FILES},
     MAGICXS            => 1,
-    SKIP               => [ $loadable_xs ? () : qw(static dynamic) ],
+    SKIP               => [$loadable_xs ? () : qw(static dynamic)],
     depend             => {'$(FIRST_MAKEFILE)' => '$(VERSION_FROM)'},
     test               => {TESTS               => join(' ', 't/pp/*.t', ($loadable_xs ? 't/xs/*.t' : ()), 'xt/*.t')},
     # Otherwise 'cxinc' isn't defined
-    ($] < 5.012 ? (DEFINE => '-DPERL_EXT') : (),),
+    ($] < 5.012   ? (DEFINE    => '-DPERL_EXT')                                                                          : (),),
+    (-d 'Sandbox' ? (realclean => {FILES => join(' ', 't/pp', 't/xs', 'inc/latest* inc/inc_*', 'config.log', 'M*.bak')}) : ()),
 );
 
 sub WriteMakefile1
